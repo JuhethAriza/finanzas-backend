@@ -7,14 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
+import java.time.LocalDate;
 
 public interface TareaRepositoryPort {
     Tarea save(Tarea tarea);
     Optional<Tarea> findById(Long id);
-    Page<Tarea> findByFiltros(Long proyectoId, Long asignadoA, EstadoTarea estado,
-                              PrioridadTarea prioridad, Pageable pageable);
+    Page<Tarea> findByFiltros(Long proyectoId, Long actividadId, Long asignadoA, EstadoTarea estado,
+                              PrioridadTarea prioridad, String buscar, LocalDate desde, LocalDate hasta, Pageable pageable);
     void deleteById(Long id);
     boolean existsById(Long id);
-    long countByProyectoId(Long proyectoId);
-    long countByProyectoIdAndEstado(Long proyectoId, EstadoTarea estado);
+    long countByActividadId(Long actividadId);
+    long countByActividadIdAndEstado(Long actividadId, EstadoTarea estado);
 }

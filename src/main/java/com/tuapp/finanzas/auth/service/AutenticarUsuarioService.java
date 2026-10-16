@@ -46,7 +46,7 @@ public class AutenticarUsuarioService implements AutenticarUsuarioUseCase {
             throw new CredencialesInvalidasException();
         }
 
-        String token = tokenPort.generarToken(usuario.getId(), usuario.getEmail());
+        String token = tokenPort.generarToken(usuario.getId(), usuario.getEmail(), java.util.List.of());
         return new ResultadoLogin(token, usuario);
     }
 
@@ -63,7 +63,7 @@ public class AutenticarUsuarioService implements AutenticarUsuarioUseCase {
                 ))
         );
 
-        String token = tokenPort.generarToken(usuario.getId(), usuario.getEmail());
+        String token = tokenPort.generarToken(usuario.getId(), usuario.getEmail(), java.util.List.of());
         return new ResultadoLogin(token, usuario);
     }
 

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 
 @Component
 public class JwtTokenAdapter implements TokenPort {
@@ -26,13 +28,14 @@ public class JwtTokenAdapter implements TokenPort {
     }
 
     @Override
-    public String generarToken(Long usuarioId, String email) {
+    public String generarToken(Long usuarioId, String email, List<String> roles) {
         Date ahora = new Date();
         Date expiracion = new Date(ahora.getTime() + expirationMs);
 
         return Jwts.builder()
                 .subject(usuarioId.toString())
                 .claim("email", email)
+                .claim("roles", roles)
                 .issuedAt(ahora)
                 .expiration(expiracion)
                 .signWith(secretKey)
@@ -40,13 +43,16 @@ public class JwtTokenAdapter implements TokenPort {
     }
 
     @Override
-    public Long validarYObtenerUsuarioId(String token) {
+    public TokenPort.TokenData validarYObtenerDatos(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return Long.valueOf(claims.getSubject());
+        Long userId = Long.valueOf(claims.getSubject());
+        List<String> roles = claims.get("roles", java.util.ArrayList.class);
+
+        return new TokenPort.TokenData(userId, roles != null ? roles : List.of());
     }
 }

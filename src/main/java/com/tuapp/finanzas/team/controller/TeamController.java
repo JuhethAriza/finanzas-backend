@@ -9,11 +9,14 @@ import com.tuapp.finanzas.team.dto.request.ActualizarTeamRequest;
 import com.tuapp.finanzas.team.dto.request.CrearTeamRequest;
 import com.tuapp.finanzas.team.dto.response.TeamMemberResponse;
 import com.tuapp.finanzas.team.dto.response.TeamResponse;
+import com.tuapp.finanzas.user.domain.model.Usuario;
+import com.tuapp.finanzas.user.domain.port.out.UsuarioRepositoryPort;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,10 +25,12 @@ public class TeamController {
 
     private final TeamUseCase teamUseCase;
     private final TeamMemberUseCase teamMemberUseCase;
+    private final UsuarioRepositoryPort usuarioRepositoryPort;
 
-    public TeamController(TeamUseCase teamUseCase, TeamMemberUseCase teamMemberUseCase) {
+    public TeamController(TeamUseCase teamUseCase, TeamMemberUseCase teamMemberUseCase, UsuarioRepositoryPort usuarioRepositoryPort) {
         this.teamUseCase = teamUseCase;
         this.teamMemberUseCase = teamMemberUseCase;
+        this.usuarioRepositoryPort = usuarioRepositoryPort;
     }
 
     @GetMapping
@@ -61,16 +66,35 @@ public class TeamController {
 
     @GetMapping("/{id}/members")
     public ResponseEntity<List<TeamMemberResponse>> listarMiembros(@PathVariable Long id) {
-        List<TeamMemberResponse> miembros = teamMemberUseCase.listarMiembros(id).stream()
-                .map(TeamMemberResponse::from)
+        List<TeamMember> members = teamMemberUseCase.listarMiembros(id);
+
+        // Resolve user names and emails
+        Map<Long, Usuario> userMap = members.stream()
+                .map(m -> m.getUserId())
+                .distinct()
+                .map(uid -> usuarioRepositoryPort.buscarPorId(uid).orElse(null))
+                .filter(u -> u != null)
+                .collect(Collectors.toMap(Usuario::getId, u -> u));
+
+        List<TeamMemberResponse> responses = members.stream()
+                .map(m -> {
+                    Usuario user = userMap.get(m.getUserId());
+                    String nombre = user != null ? user.getNombre() : null;
+                    String email = user != null ? user.getEmail() : null;
+                    return TeamMemberResponse.from(m, nombre, email);
+                })
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(miembros);
+
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping("/{id}/members")
     public ResponseEntity<TeamMemberResponse> agregarMiembro(@PathVariable Long id, @RequestBody @Valid AgregarMiembroRequest request) {
         TeamMember member = teamMemberUseCase.agregarMiembro(id, request.userId(), request.rol());
-        return ResponseEntity.status(201).body(TeamMemberResponse.from(member));
+        Usuario user = usuarioRepositoryPort.buscarPorId(request.userId()).orElse(null);
+        return ResponseEntity.status(201).body(TeamMemberResponse.from(member,
+                user != null ? user.getNombre() : null,
+                user != null ? user.getEmail() : null));
     }
 
     @DeleteMapping("/{id}/members/{userId}")

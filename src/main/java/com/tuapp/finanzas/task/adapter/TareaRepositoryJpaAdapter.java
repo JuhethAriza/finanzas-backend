@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.time.LocalDate;
 
 @Component
 public class TareaRepositoryJpaAdapter implements TareaRepositoryPort {
@@ -33,9 +34,11 @@ public class TareaRepositoryJpaAdapter implements TareaRepositoryPort {
     }
 
     @Override
-    public Page<Tarea> findByFiltros(Long proyectoId, Long asignadoA, EstadoTarea estado,
-                                     PrioridadTarea prioridad, Pageable pageable) {
-        return jpaRepository.buscarConFiltros(proyectoId, asignadoA, estado, prioridad, pageable)
+    public Page<Tarea> findByFiltros(Long proyectoId, Long actividadId, Long asignadoA, EstadoTarea estado,
+                                     PrioridadTarea prioridad, String buscar, LocalDate desde, LocalDate hasta,
+                                     Pageable pageable) {
+        return jpaRepository.buscarConFiltros(proyectoId, actividadId, asignadoA, estado, prioridad,
+                        buscar, desde, hasta, pageable)
                 .map(mapper::toDomain);
     }
 
@@ -50,12 +53,12 @@ public class TareaRepositoryJpaAdapter implements TareaRepositoryPort {
     }
 
     @Override
-    public long countByProyectoId(Long proyectoId) {
-        return jpaRepository.countByProyectoId(proyectoId);
+    public long countByActividadId(Long actividadId) {
+        return jpaRepository.countByActividadId(actividadId);
     }
 
     @Override
-    public long countByProyectoIdAndEstado(Long proyectoId, EstadoTarea estado) {
-        return jpaRepository.countByProyectoIdAndEstado(proyectoId, estado);
+    public long countByActividadIdAndEstado(Long actividadId, EstadoTarea estado) {
+        return jpaRepository.countByActividadIdAndEstado(actividadId, estado);
     }
 }

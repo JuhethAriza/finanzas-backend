@@ -1,6 +1,10 @@
 package com.tuapp.finanzas.auth.domain.port.out;
 
+import java.util.List;
+
 public interface TokenPort {
-    String generarToken(Long usuarioId, String email);
-    Long validarYObtenerUsuarioId(String token);
+    record TokenData(Long usuarioId, List<String> roles) {}
+
+    String generarToken(Long usuarioId, String email, List<String> roles);
+    TokenData validarYObtenerDatos(String token);
 }
