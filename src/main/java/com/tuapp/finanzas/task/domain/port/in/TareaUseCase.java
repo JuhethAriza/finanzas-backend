@@ -8,6 +8,9 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.time.Instant;
+
+
 public interface TareaUseCase {
 
     Tarea crear(String titulo, String descripcion, Long actividadId, Long proyectoId, Long asignadoA,

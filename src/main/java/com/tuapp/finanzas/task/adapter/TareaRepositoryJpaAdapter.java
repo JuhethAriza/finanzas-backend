@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.time.LocalDate;
 
@@ -60,5 +61,12 @@ public class TareaRepositoryJpaAdapter implements TareaRepositoryPort {
     @Override
     public long countByActividadIdAndEstado(Long actividadId, EstadoTarea estado) {
         return jpaRepository.countByActividadIdAndEstado(actividadId, estado);
+    }
+
+    @Override
+    public List<Tarea> findByRangoFechas(Instant start, Instant end, Long proyectoId, Long usuarioId) {
+        return jpaRepository.buscarPorRangoFechas(start, end, proyectoId, usuarioId).stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

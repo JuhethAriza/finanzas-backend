@@ -46,6 +46,7 @@ public class Tarea {
         if (actividadId == null) {
             throw new TareaInvalidaException("La tarea debe pertenecer a una actividad");
         }
+        validarFechas(fechaInicio, fechaFin);
         Instant ahora = Instant.now();
         PrioridadTarea prioridadFinal = prioridad != null ? prioridad : PrioridadTarea.MEDIA;
         return new Tarea(null, titulo, descripcion, actividadId, proyectoId, asignadoA,
@@ -65,6 +66,13 @@ public class Tarea {
         validarTitulo(nuevoTitulo);
         this.titulo = nuevoTitulo;
         this.descripcion = nuevaDescripcion;
+        this.fechaActualizacion = Instant.now();
+    }
+
+    public void reprogramar(Instant nuevaFechaInicio, Instant nuevaFechaFin) {
+        validarFechas(nuevaFechaInicio, nuevaFechaFin);
+        this.fechaInicio = nuevaFechaInicio;
+        this.fechaFin = nuevaFechaFin;
         this.fechaActualizacion = Instant.now();
     }
 

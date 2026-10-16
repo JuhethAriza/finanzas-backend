@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.time.Instant;
+
 public record TareaRequest(
         @NotBlank(message = "El título es obligatorio") String titulo,
         String descripcion,
