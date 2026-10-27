@@ -1,12 +1,16 @@
 package com.tuapp.finanzas.shared.exception;
 
 import com.tuapp.finanzas.auth.domain.exception.CredencialesInvalidasException;
+import com.tuapp.finanzas.project.domain.exception.ProyectoInvalidoException;
+import com.tuapp.finanzas.project.domain.exception.ProyectoNoEncontradoException;
 import com.tuapp.finanzas.team.domain.exception.MiembroNoEncontradoException;
 import com.tuapp.finanzas.team.domain.exception.MiembroYaEnEquipoException;
 import com.tuapp.finanzas.team.domain.exception.TeamNoEncontradoException;
 import com.tuapp.finanzas.user.domain.exception.EmailInvalidoException;
 import com.tuapp.finanzas.user.domain.exception.EmailYaRegistradoException;
 import com.tuapp.finanzas.user.domain.exception.UsuarioNoEncontradoException;
+import com.tuapp.finanzas.task.domain.exception.TareaInvalidaException;
+import com.tuapp.finanzas.task.domain.exception.TareaNoEncontradaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -26,6 +30,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsuarioNoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> handleUsuarioNoEncontrado(UsuarioNoEncontradoException ex) {
         return construirRespuesta(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(TareaNoEncontradaException.class)
+    public ResponseEntity<Map<String, Object>> handleTareaNoEncontrada(TareaNoEncontradaException ex) {
+        return construirRespuesta(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(TareaInvalidaException.class)
+    public ResponseEntity<Map<String, Object>> handleTareaInvalida(TareaInvalidaException ex) {
+        return construirRespuesta(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(EmailInvalidoException.class)
@@ -90,6 +104,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MiembroNoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> handleMiembroNoEncontrado(MiembroNoEncontradoException ex) {
         return construirRespuesta(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(ProyectoNoEncontradoException.class)
+    public ResponseEntity<Map<String, Object>> handleProyectoNoEncontrado(ProyectoNoEncontradoException ex) {
+        return construirRespuesta(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(ProyectoInvalidoException.class)
+    public ResponseEntity<Map<String, Object>> handleProyectoInvalido(ProyectoInvalidoException ex) {
+        return construirRespuesta(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

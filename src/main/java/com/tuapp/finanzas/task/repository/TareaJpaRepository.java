@@ -8,23 +8,50 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 
 public interface TareaJpaRepository extends JpaRepository<TareaEntity, Long> {
 
     @Query("""
-        SELECT t FROM TareaEntity t
-        WHERE (:proyectoId IS NULL OR t.proyectoId = :proyectoId)
-        AND (:asignadoA IS NULL OR t.asignadoA = :asignadoA)
-        AND (:estado IS NULL OR t.estado = :estado)
-        AND (:prioridad IS NULL OR t.prioridad = :prioridad)
-        """)
+            SELECT t FROM TareaEntity t
+            WHERE (:proyectoId IS NULL OR t.proyectoId = :proyectoId)
+            AND (:actividadId IS NULL OR t.actividadId = :actividadId)
+            AND (:asignadoA IS NULL OR t.asignadoA = :asignadoA)
+            AND (:estado IS NULL OR t.estado = :estado)
+            AND (:prioridad IS NULL OR t.prioridad = :prioridad)
+            AND (:buscar IS NULL OR LOWER(t.titulo) LIKE LOWER(CONCAT('%', :buscar, '%'))
+                 OR LOWER(t.descripcion) LIKE LOWER(CONCAT('%', :buscar, '%')))
+            AND (:desde IS NULL OR t.fechaLimite >= :desde)
+            AND (:hasta IS NULL OR t.fechaLimite <= :hasta)
+            """)
     Page<TareaEntity> buscarConFiltros(@Param("proyectoId") Long proyectoId,
-                                       @Param("asignadoA") Long asignadoA,
-                                       @Param("estado") EstadoTarea estado,
-                                       @Param("prioridad") PrioridadTarea prioridad,
-                                       Pageable pageable);
+            @Param("actividadId") Long actividadId,
+            @Param("asignadoA") Long asignadoA,
+            @Param("estado") EstadoTarea estado,
+            @Param("prioridad") PrioridadTarea prioridad,
+            @Param("buscar") String buscar,
+            @Param("desde") LocalDate desde,
+            @Param("hasta") LocalDate hasta,
+            Pageable pageable);
+
+    long countByActividadIdAndEstado(Long actividadId, EstadoTarea estado);
+
+    long countByActividadId(Long actividadId);
+
+    long countByProyectoId(Long proyectoId);
 
     long countByProyectoIdAndEstado(Long proyectoId, EstadoTarea estado);
 
-    long countByProyectoId(Long proyectoId);
+    @Query("""
+            SELECT t FROM TareaEntity t
+            WHERE t.fechaInicio <= :end AND t.fechaFin >= :start
+            AND (:proyectoId IS NULL OR t.proyectoId = :proyectoId)
+            AND (:usuarioId IS NULL OR t.asignadoA = :usuarioId)
+            """)
+    List<TareaEntity> buscarPorRangoFechas(@Param("start") Instant start,
+            @Param("end") Instant end,
+            @Param("proyectoId") Long proyectoId,
+            @Param("usuarioId") Long usuarioId);
 }

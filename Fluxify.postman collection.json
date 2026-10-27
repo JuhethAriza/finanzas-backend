@@ -1,0 +1,1764 @@
+{
+  "info": {
+    "name": "Fluxify",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Colección generada desde los controladores. 1) Importa. 2) Ejecuta *Crear usuario* y luego *Login*: el token se guarda solo. 3) Sigue el orden de las carpetas; los `id` creados se guardan en variables."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    },
+    {
+      "key": "teamId",
+      "value": "1"
+    },
+    {
+      "key": "projectId",
+      "value": "1"
+    },
+    {
+      "key": "activityId",
+      "value": "1"
+    },
+    {
+      "key": "taskId",
+      "value": "1"
+    },
+    {
+      "key": "itemId",
+      "value": "1"
+    },
+    {
+      "key": "commentId",
+      "value": "1"
+    },
+    {
+      "key": "fileId",
+      "value": "1"
+    },
+    {
+      "key": "workdayId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 · Autenticación",
+      "item": [
+        {
+          "name": "Login (guarda el token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"junior@test.com\",\n  \"password\": \"Password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Público. Guarda automáticamente `token` y `userId` en las variables de la colección."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.token) pm.collectionVariables.set(\"token\", j.token);",
+                  "if (j.usuario && j.usuario.id !== undefined) pm.collectionVariables.set(\"userId\", j.usuario.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login con Google",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/google",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "google"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"<id_token_de_Google>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Público. Requiere un idToken real emitido por Google."
+          }
+        },
+        {
+          "name": "Perfil actual (me)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 · Usuarios",
+      "item": [
+        {
+          "name": "Crear usuario (registro)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Junior\",\n  \"email\": \"junior@test.com\",\n  \"password\": \"Password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Público (no necesita token)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"userId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "Obtener usuario",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar nombre",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "{{userId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Junior Pedroza\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 · Equipos",
+      "item": [
+        {
+          "name": "Listar equipos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams"]
+            }
+          }
+        },
+        {
+          "name": "Crear equipo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Equipo Finanzas\",\n  \"descripcion\": \"Equipo del SaaS financiero\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"teamId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener equipo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams", "{{teamId}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar equipo",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams", "{{teamId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Equipo Finanzas v2\",\n  \"descripcion\": \"Descripción actualizada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar equipo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams", "{{teamId}}"]
+            }
+          }
+        },
+        {
+          "name": "Listar miembros del equipo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/{{teamId}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams", "{{teamId}}", "members"]
+            }
+          }
+        },
+        {
+          "name": "Agregar miembro al equipo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/{{teamId}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams", "{{teamId}}", "members"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{userId}},\n  \"rol\": \"MIEMBRO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "`rol` es texto libre; si va vacío queda `MIEMBRO`. **Hay que agregar al usuario al equipo antes de agregarlo a un proyecto de ese equipo.**"
+          }
+        },
+        {
+          "name": "Quitar miembro del equipo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teams/{{teamId}}/members/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams", "{{teamId}}", "members", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 · Proyectos",
+      "item": [
+        {
+          "name": "Listar proyectos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "teamId",
+                  "value": "{{teamId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "estado",
+                  "value": "ACTIVO",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Filtros opcionales: `teamId`, `estado` (ACTIVO | PAUSADO | COMPLETADO | CANCELADO). Paginado."
+          }
+        },
+        {
+          "name": "Crear proyecto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Proyecto Demo\",\n  \"descripcion\": \"Proyecto de prueba\",\n  \"teamId\": {{teamId}},\n  \"responsableId\": {{userId}},\n  \"estado\": \"ACTIVO\",\n  \"fechaInicio\": \"2026-11-01T00:00:00Z\",\n  \"fechaFin\": \"2026-12-31T23:59:59Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Fechas en formato ISO-8601 con zona (`Instant`), p. ej. `2026-11-01T00:00:00Z`. `responsableId` y `estado` son opcionales (por defecto ACTIVO)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"projectId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener proyecto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar proyecto (parcial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Proyecto Demo editado\",\n  \"estado\": \"PAUSADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "PATCH parcial: los campos que no envíes no cambian. El equipo no se puede cambiar."
+          }
+        },
+        {
+          "name": "Cambiar estado del proyecto",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/status?estado=COMPLETADO",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}", "status"],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "COMPLETADO"
+                }
+              ]
+            },
+            "description": "Devuelve 204 sin cuerpo."
+          }
+        },
+        {
+          "name": "Eliminar proyecto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}"]
+            }
+          }
+        },
+        {
+          "name": "Listar miembros del proyecto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}", "members"]
+            }
+          }
+        },
+        {
+          "name": "Agregar miembro al proyecto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}", "members"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": {{userId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "El usuario debe ser miembro del equipo del proyecto; si no, devuelve 400."
+          }
+        },
+        {
+          "name": "Quitar miembro del proyecto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/members/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "members",
+                "{{userId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Estadísticas del proyecto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 · Actividades",
+      "item": [
+        {
+          "name": "Listar actividades del proyecto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}", "activities"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear actividad",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}", "activities"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Backlog inicial\",\n  \"descripcion\": \"Primeras tareas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"activityId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener actividad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar actividad",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Backlog editado\",\n  \"descripcion\": \"Descripción nueva\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar actividad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mis actividades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/my-activities?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "my-activities"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Actividades de los proyectos donde eres miembro (tabla `proyecto_miembros`)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 · Tareas",
+      "item": [
+        {
+          "name": "Listar tareas de la actividad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "asignadoA",
+                  "value": "{{userId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "estado",
+                  "value": "BACKLOG",
+                  "disabled": true
+                },
+                {
+                  "key": "prioridad",
+                  "value": "MEDIA",
+                  "disabled": true
+                },
+                {
+                  "key": "buscar",
+                  "value": "texto",
+                  "disabled": true
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-11-30",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "`desde`/`hasta` en formato `yyyy-MM-dd`."
+          }
+        },
+        {
+          "name": "Crear tarea",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Primera tarea\",\n  \"descripcion\": \"Descripción de la tarea\",\n  \"actividadId\": {{activityId}},\n  \"asignadoA\": {{userId}},\n  \"estado\": \"BACKLOG\",\n  \"prioridad\": \"MEDIA\",\n  \"fechaLimite\": \"2026-11-30\",\n  \"fechaInicio\": \"2026-11-01T08:00:00Z\",\n  \"fechaFin\": \"2026-11-05T18:00:00Z\",\n  \"etiquetas\": [\"backend\", \"api\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "**Obligatorios:** `titulo`, `actividadId`, `fechaInicio`, `fechaFin` (ISO-8601 con zona). Estados: BACKLOG, PENDIENTE, POR_HACER, EN_PROGRESO, EN_REVISION, COMPLETADA. Prioridades: BAJA, MEDIA, ALTA, URGENTE."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"taskId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener tarea",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks",
+                "{{taskId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar tarea (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks",
+                "{{taskId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Título editado\",\n  \"prioridad\": \"ALTA\",\n  \"fechaFin\": \"2026-11-10T18:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Las fechas (`fechaInicio`/`fechaFin`) son opcionales aquí: la que no envíes conserva su valor."
+          }
+        },
+        {
+          "name": "Reemplazar tarea (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks",
+                "{{taskId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Tarea reemplazada\",\n  \"descripcion\": \"Reemplazo completo\",\n  \"actividadId\": {{activityId}},\n  \"asignadoA\": {{userId}},\n  \"estado\": \"EN_PROGRESO\",\n  \"prioridad\": \"ALTA\",\n  \"fechaLimite\": \"2026-11-30\",\n  \"fechaInicio\": \"2026-11-01T08:00:00Z\",\n  \"fechaFin\": \"2026-11-05T18:00:00Z\",\n  \"etiquetas\": [\"backend\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar tarea",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks",
+                "{{taskId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cambiar estado de la tarea",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks/{{taskId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks",
+                "{{taskId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"EN_PROGRESO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Acepta el cuerpo `{\"estado\": \"...\"}` o el parámetro de consulta `?estado=`."
+          }
+        },
+        {
+          "name": "Asignar tarea",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks/{{taskId}}/assign",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks",
+                "{{taskId}}",
+                "assign"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": {{userId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cambiar prioridad",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks/{{taskId}}/priority",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks",
+                "{{taskId}}",
+                "priority"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prioridad\": \"URGENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cambiar fecha límite",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/activities/{{activityId}}/tasks/{{taskId}}/due-date",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "activities",
+                "{{activityId}}",
+                "tasks",
+                "{{taskId}}",
+                "due-date"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaLimite\": \"2026-12-15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar todas las tareas (filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "proyectoId",
+                  "value": "{{projectId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "actividadId",
+                  "value": "{{activityId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "asignadoA",
+                  "value": "{{userId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "estado",
+                  "value": "BACKLOG",
+                  "disabled": true
+                },
+                {
+                  "key": "prioridad",
+                  "value": "MEDIA",
+                  "disabled": true
+                },
+                {
+                  "key": "buscar",
+                  "value": "texto",
+                  "disabled": true
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-11-30",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mis tareas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/mine?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "mine"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "proyectoId",
+                  "value": "{{projectId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "estado",
+                  "value": "BACKLOG",
+                  "disabled": true
+                },
+                {
+                  "key": "prioridad",
+                  "value": "MEDIA",
+                  "disabled": true
+                },
+                {
+                  "key": "buscar",
+                  "value": "texto",
+                  "disabled": true
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-11-30",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 · Recursos de tarea (checklist, comentarios, archivos)",
+      "item": [
+        {
+          "name": "Checklist: listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "checklist"]
+            }
+          }
+        },
+        {
+          "name": "Checklist: crear ítem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "checklist"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Revisar el PR\",\n  \"posicion\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"itemId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Checklist: actualizar ítem",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/checklist/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "checklist", "{{itemId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"completado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Todos los campos son opcionales: `contenido`, `completado`, `posicion`."
+          }
+        },
+        {
+          "name": "Checklist: eliminar ítem",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/checklist/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "checklist", "{{itemId}}"]
+            }
+          }
+        },
+        {
+          "name": "Comentarios: listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "comments"]
+            }
+          }
+        },
+        {
+          "name": "Comentarios: crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "comments"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Primer comentario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"commentId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Comentarios: editar",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/comments/{{commentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "tasks",
+                "{{taskId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Comentario editado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Solo el autor puede editarlo."
+          }
+        },
+        {
+          "name": "Comentarios: eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/comments/{{commentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "tasks",
+                "{{taskId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "description": "Solo el autor puede eliminarlo."
+          }
+        },
+        {
+          "name": "Archivos: listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/files",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "files"]
+            }
+          }
+        },
+        {
+          "name": "Archivos: subir",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/files",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "files"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "description": "Body → form-data → clave `file` de tipo **File**. Selecciona un archivo en Postman."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"fileId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Archivos: descargar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/files/{{fileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "files", "{{fileId}}"]
+            },
+            "description": "Usa **Send and Download** para guardar el archivo."
+          }
+        },
+        {
+          "name": "Archivos: eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/files/{{fileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "files", "{{fileId}}"]
+            }
+          }
+        },
+        {
+          "name": "Historial de actividad de la tarea",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/activity",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "activity"]
+            }
+          }
+        },
+        {
+          "name": "Permisos sobre la tarea",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/permissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "permissions"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8 · Jornadas (workdays)",
+      "item": [
+        {
+          "name": "Jornadas: listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/workdays?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "workdays"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Jornadas: crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/workdays",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "workdays"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tareaId\": {{taskId}},\n  \"fecha\": \"2026-11-02\",\n  \"horasTrabajadas\": 2.5,\n  \"notas\": \"Avance del módulo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j && j.id !== undefined) pm.collectionVariables.set(\"workdayId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Jornadas: obtener",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/workdays/{{workdayId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "tasks",
+                "{{taskId}}",
+                "workdays",
+                "{{workdayId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Jornadas: actualizar",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/workdays/{{workdayId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "tasks",
+                "{{taskId}}",
+                "workdays",
+                "{{workdayId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"2026-11-03\",\n  \"horasTrabajadas\": 4.0,\n  \"notas\": \"Notas editadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Jornadas: eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/workdays/{{workdayId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "tasks",
+                "{{taskId}}",
+                "workdays",
+                "{{workdayId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9 · Calendario y logs",
+      "item": [
+        {
+          "name": "Calendario (proyectos y tareas)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/calendar",
+              "host": ["{{baseUrl}}"],
+              "path": ["calendar"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Ojo: esta ruta NO lleva el prefijo `/api`. Sin filtros devuelve todos los eventos."
+          }
+        },
+        {
+          "name": "Registro de actividad global",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/activity-logs?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "activity-logs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "action",
+                  "value": "TAREA_CREADA",
+                  "disabled": true
+                },
+                {
+                  "key": "resourceType",
+                  "value": "Task",
+                  "disabled": true
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

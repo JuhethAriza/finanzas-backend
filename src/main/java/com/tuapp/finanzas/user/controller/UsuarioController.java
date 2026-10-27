@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,7 +41,8 @@ public class UsuarioController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UsuarioResponse> actualizarNombre(@PathVariable Long id, @RequestBody @Valid ActualizarNombreRequest request) {
+    public ResponseEntity<UsuarioResponse> actualizarNombre(@PathVariable Long id,
+            @RequestBody @Valid ActualizarNombreRequest request) {
         return ResponseEntity.ok(UsuarioResponse.from(usuarioUseCase.actualizarNombre(id, request.nombre())));
     }
 

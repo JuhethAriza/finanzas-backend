@@ -9,7 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 @Component
 public class TareaRepositoryJpaAdapter implements TareaRepositoryPort {
@@ -33,9 +36,11 @@ public class TareaRepositoryJpaAdapter implements TareaRepositoryPort {
     }
 
     @Override
-    public Page<Tarea> findByFiltros(Long proyectoId, Long asignadoA, EstadoTarea estado,
-                                     PrioridadTarea prioridad, Pageable pageable) {
-        return jpaRepository.buscarConFiltros(proyectoId, asignadoA, estado, prioridad, pageable)
+    public Page<Tarea> findByFiltros(Long proyectoId, Long actividadId, Long asignadoA, EstadoTarea estado,
+                                     PrioridadTarea prioridad, String buscar, LocalDate desde, LocalDate hasta,
+                                     Pageable pageable) {
+        return jpaRepository.buscarConFiltros(proyectoId, actividadId, asignadoA, estado, prioridad,
+                        buscar, desde, hasta, pageable)
                 .map(mapper::toDomain);
     }
 
@@ -50,6 +55,16 @@ public class TareaRepositoryJpaAdapter implements TareaRepositoryPort {
     }
 
     @Override
+    public long countByActividadId(Long actividadId) {
+        return jpaRepository.countByActividadId(actividadId);
+    }
+
+    @Override
+    public long countByActividadIdAndEstado(Long actividadId, EstadoTarea estado) {
+        return jpaRepository.countByActividadIdAndEstado(actividadId, estado);
+    }
+
+    @Override
     public long countByProyectoId(Long proyectoId) {
         return jpaRepository.countByProyectoId(proyectoId);
     }
@@ -57,5 +72,12 @@ public class TareaRepositoryJpaAdapter implements TareaRepositoryPort {
     @Override
     public long countByProyectoIdAndEstado(Long proyectoId, EstadoTarea estado) {
         return jpaRepository.countByProyectoIdAndEstado(proyectoId, estado);
+    }
+
+    @Override
+    public List<Tarea> findByRangoFechas(Instant start, Instant end, Long proyectoId, Long usuarioId) {
+        return jpaRepository.buscarPorRangoFechas(start, end, proyectoId, usuarioId).stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

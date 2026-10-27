@@ -3,50 +3,68 @@ package com.tuapp.finanzas.task.domain.model;
 import com.tuapp.finanzas.task.domain.exception.TareaInvalidaException;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 
 public class Tarea {
 
     private final Long id;
     private String titulo;
     private String descripcion;
-    private final Long proyectoId;
+    private Long actividadId;
+    private Long proyectoId;
     private Long asignadoA;
     private EstadoTarea estado;
     private PrioridadTarea prioridad;
+    private LocalDate fechaLimite;
+    private Instant fechaInicio;
+    private Instant fechaFin;
+    private List<String> etiquetas;
     private final Instant fechaCreacion;
     private Instant fechaActualizacion;
 
-    private Tarea(Long id, String titulo, String descripcion, Long proyectoId, Long asignadoA,
+    private Tarea(Long id, String titulo, String descripcion, Long actividadId, Long proyectoId, Long asignadoA,
                   EstadoTarea estado, PrioridadTarea prioridad,
+                  LocalDate fechaLimite, Instant fechaInicio, Instant fechaFin, List<String> etiquetas,
                   Instant fechaCreacion, Instant fechaActualizacion) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
+        this.actividadId = actividadId;
         this.proyectoId = proyectoId;
         this.asignadoA = asignadoA;
         this.estado = estado;
         this.prioridad = prioridad;
+        this.fechaLimite = fechaLimite;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.etiquetas = etiquetas == null ? List.of() : List.copyOf(etiquetas);
         this.fechaCreacion = fechaCreacion;
         this.fechaActualizacion = fechaActualizacion;
     }
 
-    public static Tarea crear(String titulo, String descripcion, Long proyectoId,
-                              Long asignadoA, PrioridadTarea prioridad) {
+    public static Tarea crear(String titulo, String descripcion, Long actividadId, Long proyectoId,
+                              Long asignadoA, EstadoTarea estado, PrioridadTarea prioridad,
+                              LocalDate fechaLimite, List<String> etiquetas,
+                              Instant fechaInicio, Instant fechaFin) {
         validarTitulo(titulo);
-        if (proyectoId == null) {
-            throw new TareaInvalidaException("La tarea debe pertenecer a un proyecto");
+        if (actividadId == null) {
+            throw new TareaInvalidaException("La tarea debe pertenecer a una actividad");
         }
+        validarFechas(fechaInicio, fechaFin);
         Instant ahora = Instant.now();
         PrioridadTarea prioridadFinal = prioridad != null ? prioridad : PrioridadTarea.MEDIA;
-        return new Tarea(null, titulo, descripcion, proyectoId, asignadoA,
-                EstadoTarea.BACKLOG, prioridadFinal, ahora, ahora);
+        return new Tarea(null, titulo, descripcion, actividadId, proyectoId, asignadoA,
+            estado == null ? EstadoTarea.BACKLOG : estado, prioridadFinal,
+            fechaLimite, fechaInicio, fechaFin, etiquetas, ahora, ahora);
     }
 
-    public static Tarea reconstruir(Long id, String titulo, String descripcion, Long proyectoId,
-                                    Long asignadoA, EstadoTarea estado, PrioridadTarea prioridad,
-                                    Instant fechaCreacion, Instant fechaActualizacion) {
-        return new Tarea(id, titulo, descripcion, proyectoId, asignadoA, estado, prioridad,
-                fechaCreacion, fechaActualizacion);
+        public static Tarea reconstruir(Long id, String titulo, String descripcion, Long actividadId, Long proyectoId,
+                        Long asignadoA, EstadoTarea estado, PrioridadTarea prioridad,
+                        LocalDate fechaLimite, Instant fechaInicio, Instant fechaFin, List<String> etiquetas,
+                        Instant fechaCreacion, Instant fechaActualizacion) {
+        return new Tarea(id, titulo, descripcion, actividadId, proyectoId, asignadoA, estado, prioridad,
+            fechaLimite, fechaInicio, fechaFin, etiquetas, fechaCreacion, fechaActualizacion);
     }
 
     public void actualizar(String nuevoTitulo, String nuevaDescripcion) {
@@ -54,6 +72,22 @@ public class Tarea {
         this.titulo = nuevoTitulo;
         this.descripcion = nuevaDescripcion;
         this.fechaActualizacion = Instant.now();
+    }
+
+    public void reprogramar(Instant nuevaFechaInicio, Instant nuevaFechaFin) {
+        validarFechas(nuevaFechaInicio, nuevaFechaFin);
+        this.fechaInicio = nuevaFechaInicio;
+        this.fechaFin = nuevaFechaFin;
+        this.fechaActualizacion = Instant.now();
+    }
+
+    /** Reprograma solo si llega al menos una fecha; la que sea null conserva el valor actual. */
+    public void reprogramarSiCorresponde(Instant nuevaFechaInicio, Instant nuevaFechaFin) {
+        if (nuevaFechaInicio == null && nuevaFechaFin == null) {
+            return;
+        }
+        reprogramar(nuevaFechaInicio != null ? nuevaFechaInicio : this.fechaInicio,
+                    nuevaFechaFin != null ? nuevaFechaFin : this.fechaFin);
     }
 
     public void cambiarEstado(EstadoTarea nuevoEstado) {
@@ -77,19 +111,74 @@ public class Tarea {
         this.fechaActualizacion = Instant.now();
     }
 
+    public void cambiarFechaLimite(LocalDate nuevaFechaLimite) {
+        this.fechaLimite = nuevaFechaLimite;
+        this.fechaActualizacion = Instant.now();
+    }
+
+    public void actualizarDetalles(String nuevoTitulo, String nuevaDescripcion, LocalDate nuevaFechaLimite,
+                                   List<String> nuevasEtiquetas) {
+        validarTitulo(nuevoTitulo);
+        this.titulo = nuevoTitulo;
+        this.descripcion = nuevaDescripcion;
+        this.fechaLimite = nuevaFechaLimite;
+        this.etiquetas = nuevasEtiquetas == null ? List.of() : List.copyOf(nuevasEtiquetas);
+        this.fechaActualizacion = Instant.now();
+    }
+
+    public void reemplazar(String nuevoTitulo, String nuevaDescripcion, Long nuevaActividadId, Long nuevoProyectoId,
+                           Long nuevoAsignadoA, EstadoTarea nuevoEstado, PrioridadTarea nuevaPrioridad,
+                           LocalDate nuevaFechaLimite, List<String> nuevasEtiquetas) {
+        validarTitulo(nuevoTitulo);
+        this.titulo = nuevoTitulo;
+        this.descripcion = nuevaDescripcion;
+        this.actividadId = nuevaActividadId;
+        this.proyectoId = nuevoProyectoId;
+        this.asignadoA = nuevoAsignadoA;
+        if (nuevoEstado != null) this.estado = nuevoEstado;
+        if (nuevaPrioridad != null) this.prioridad = nuevaPrioridad;
+        this.fechaLimite = nuevaFechaLimite;
+        this.etiquetas = nuevasEtiquetas == null ? List.of() : List.copyOf(nuevasEtiquetas);
+        this.fechaActualizacion = Instant.now();
+    }
+
+    private static void validarFechas(Instant fechaInicio, Instant fechaFin) {
+        if (fechaInicio == null || fechaFin == null) {
+            throw new TareaInvalidaException("La tarea debe tener fecha de inicio y de fin");
+        }
+        if (fechaFin.isBefore(fechaInicio)) {
+            throw new TareaInvalidaException("La fecha de fin no puede ser anterior a la fecha de inicio");
+        }
+    }
+
     private static void validarTitulo(String titulo) {
         if (titulo == null || titulo.isBlank()) {
             throw new TareaInvalidaException("El título de la tarea no puede estar vacío");
         }
     }
 
+    public void setActividadId(Long actividadId) {
+        this.actividadId = actividadId;
+        this.fechaActualizacion = Instant.now();
+    }
+
+    public void setProyectoId(Long proyectoId) {
+        this.proyectoId = proyectoId;
+        this.fechaActualizacion = Instant.now();
+    }
+
     public Long getId() { return id; }
     public String getTitulo() { return titulo; }
     public String getDescripcion() { return descripcion; }
+    public Long getActividadId() { return actividadId; }
     public Long getProyectoId() { return proyectoId; }
     public Long getAsignadoA() { return asignadoA; }
     public EstadoTarea getEstado() { return estado; }
     public PrioridadTarea getPrioridad() { return prioridad; }
+    public LocalDate getFechaLimite() { return fechaLimite; }
+    public Instant getFechaInicio() { return fechaInicio; }
+    public Instant getFechaFin() { return fechaFin; }
+    public List<String> getEtiquetas() { return etiquetas; }
     public Instant getFechaCreacion() { return fechaCreacion; }
     public Instant getFechaActualizacion() { return fechaActualizacion; }
 }
